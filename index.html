@@ -3,38 +3,30 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>modal</title>
+    <title>前端一万小时-modal</title>
     <style>
-      /*❗️请按序号阅读和跟写！*/
 
       .modal {
-        position: fixed;  /*①当点击后，这个“模态框”会把整个页面遮起来。那我们就可以用“固定定位”来实现*/
-                          /*💡④-5：这里也是 model 里所有设置为“绝对定位”的子元素的参照“锚点”。*/
-        
-        /*②设置“固定定位”的位置，这里需要使其“撑满”整个页面；*/
+        position: fixed;  
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
         
-        display: none;  /*③-1：未点击状态时，这个“模态框”是隐藏起来的；*/
+        display: none; 
       }
 
       .modal.show {
-        display: block;  /*③-2：当我需要的时候，“模态框”再显示；*/
-                         /*❗️❗️❗️效果的控制我们最好在 CSS 里，通过 DOM 的 clss 来进行，尽量不要放在 JS 上。
-                         这样的话，后边想在 show 上再加一些 CSS3 的过渡或动画时，我们直接在 CSS 里改就行了，JS 都不用动！*/
+        display: block;  
       }
 
 
-      .modal::before {  /*④-1：使用“伪元素”来给这个“模态框”加一个“遮罩”；*/
+      .modal::before {  
         content: '';
         display: block;
-        background-color: rgba(0,0,0,0.3);  /*④-2：设置“遮罩”的模糊度；*/
+        background-color: rgba(0,0,0,0.3);  
         
-        position: absolute;  /*④-3：设置为“绝对定位”脱离文档流；*/
-        
-        /*④-4：设置“绝对定位”的位置，这里我们也需要让它“撑开”页面；*/
+        position: absolute; 
         left: 0;
         top: 0;
         bottom: 0;
@@ -42,91 +34,80 @@
       }
 
       .modal>.container {  
-        position: absolute;  /*⑦-1：设置为“绝对定位”，脱离文档流，并方便对其位置进行操控；*/
+        position: absolute;  
         
-        left: 50%;  /*⑦-2：使 container 基于父元素水平方向居中；*/ 
-        top: 40%;  /*⑦-3：然后垂直方向为“父元素高度的 40%*/
-        transform: translate(-50%, -50%);   /*⑦-4：使盒子基于自身宽高再进行“水平”和“垂直”居中；*/
+        left: 50%;  
+        top: 40%;  
+        transform: translate(-50%, -50%);   
         
-        width: 60%;  /*⑤我们给 container 设置一个宽度为“父元素宽度的 60%”，高度为“通过内容自己填充”；*/
-        background-color: #fff;  /*⑥设置一个“白色”的背景色；*/
+        width: 60%;  
+        background-color: #fff;  
       }
 
-      .modal>.container .header {  /*⑧对 container 里边的 header 进行一些常规样式的设置；*/
+      .modal>.container .header {  
         padding: 10px;
         font-weight: bold;
         border-bottom: 1px solid #ccc;
       }
 
-      .modal>.container .header::after {  /*⑨-3：利用“伪元素”清除浮动；*/
+      .modal>.container .header::after {  
         content: '';
         display: block;
         clear: both;
       }
 
-      .modal>.container .close {  /*⑨对右上角的“小✘”进行样式的设置；*/
-        float: right;  /*⑨-1：使其“右”浮动*/
-        cursor: pointer;  /*⑨-2：加一个“手”的样式；*/
+      .modal>.container .close {  
+        float: right;  
+        cursor: pointer; 
       }
 
-      .modal>.container .content {  /*⑩对 container 里边的 content 进行一些常规样式的设置；*/
+      .modal>.container .content {  
         padding: 10px;
         border-bottom: 1px solid #ccc;
       }
 
-      .modal>.container .footer {  /*⑪对 container 里边的 footer 进行一些常规样式的设置；*/
+      .modal>.container .footer {  
         padding: 10px;
         text-align: center; 
       }
 
-      .btn {  /*⑫给 footer 里边的 btn 进行一些常规样式的设置；*/
-        border: 1px solid #ccc;  /*⑫-1：加一个边框；*/
-        text-decoration: none;  /*⑫-2：将“链接”的本来样式（下划线）去掉；*/
-        color: #333;
+      .btn {  
+        border: 1px solid #ccc;  
+        text-decoration: none;  
         font-size: 14px;
         padding: 4px 8px;
-        border-radius: 4px;  /*⑫-3：加一个圆角；*/
-        display: inline-block;  /*⑫-4：设置为“行内盒子”。*/
+        border-radius: 4px;  
+        display: inline-block;  
       }      
     </style>
   </head>
   <body>
-    <!--1️⃣有 3 个按钮（或者更多），它们在外观上是一样的，在功能上有一样的、也有不一样的。
-    我们用不同的 id 和 class 名来区分“不一样”；
-    用相同的 class 名（model-target）来表示“一样”，表示它们都是“模态框的目标”！-->
+    
     <button id="login" class="login modal-target">登录</button>
     <button id="register" class="register modal-target">注册</button>
     <button id="logout" class="logout modal-target"> 注销</button>
 
     
-    <div class="modal" data-target="login">  <!--2️⃣-①：当用户点击上边任何一个“按钮”时，会弹出一个相同样式的“框”。
-                                             这个框里边包含以下几个部分：header、content 和 footer；-->
-                                             <!--2️⃣-②：“框”的样式是一样的，但所做的事可不一样！
-                                             我们通过自定义属性 data-target 来区分。
-                                             自定义属性可以自己随便加（一般以 data- 开头，后边自己随便取），
-                                             目的就是为了不在 class 上加太多的东西。-->
-                                             <!--2️⃣-③：这整行代码就表示“我是 model，
-                                             我的目标是 login”。-->
+    <div class="modal" data-target="login">  
       <div class="container">
         <div class="header">
           我是标题
-          <span class="close">X</span>  <!--💡这是右上角可点击的关闭“小✘”：点击后退出模态框。-->
+          <span class="close">X</span>  
         </div>
         
         <div class="content">
-          <p> 我是内容</p>
-          <p> 我是内容</p>
+          <p> 我是登录</p>
+          <p> 我是登录</p>
         </div>
         
         <div class="footer">
-          <a href="#" class="btn">确定</a>  <!--💡这是下方可点击的“确定”按钮：点击后退出模态框。-->
+          <a href="#" class="btn">确定</a>  
         </div>
         
       </div>
     </div>
 
-    <div class="modal" data-target="register">  <!--3️⃣每个“框”的结构都是一样的。
-                                                我们用 data-target 来区分一下。-->
+    <div class="modal" data-target="register">  
       <div class="container">
         <div class="header">
           我是标题
@@ -154,7 +135,7 @@
         
         <div class="content">
           <p> 我是注销</p>
-          <p> 我是注册</p>
+          <p> 我是注销</p>
         </div>
         
         <div class="footer">
@@ -163,7 +144,7 @@
       </div>
     </div>
     <script>
-      //1️⃣为了后边使用方便，我们一开始就写个方法，让 $() 和 $$() 可以在代码编辑器中直接使用；
+      
       function $(selector){
         return document.querySelector(selector)
       }
@@ -171,38 +152,27 @@
         return document.querySelectorAll(selector)
       }
 
-      /*2️⃣首先，我们写一个函数 bindBatch，让这个函数只做一件事：遍历 nodeList 里的每一项，
-      并添加一个“点击”事件；*/
-      function bindBatch(nodeList, handler){  /*2️⃣-1：我们声明一个函数 bindBatch（批量绑定），
-                                              传入两个形参：nodeList（类数组对象）和 handler(事件处理程序)；*/
-        nodeList.forEach(node=>{  //2️⃣-2：通过 forEach 遍历这个“类数组对象”；
-          node.onclick = handler  /*2️⃣-3：然后给“每一项”都绑定一个“点击事件”，
-                                  并将“事件处理程序 handler”赋值给这个“点击事件”；*/
+      
+      function bindBatch(nodeList, handler){ 
+        nodeList.forEach(node=>{  
+          node.onclick = handler  
         })
       }
 
 
-      /*3️⃣当我们调用函数 bindBatch 时，传入两个“实参”：
-      3️⃣-1：$$(".model-target") 得到一个“类数组对象”；
-      3️⃣-2：另一个“实参”为点击事件的处理函数，当“登录/注册/注销”按钮被点击时，将执行这个函数里的函数体；*/
+      
       bindBatch($$(".modal-target"), function(){      
-        
-        /*❗️❗️❗️3️⃣-3：这个处理函数的“函数体”的意思是：
-        我会获取你点击项的“id——this.id”，然后根据这个 id 来获取我需要展示出来的 model。
-        然后，然后通过“class 操作”添加一个 show ；*/
-        $(`.modal[data-target=${ this.id}]`).classList.add("show")  //💡这里边我们为了简洁，用了 ES6 字符串模板。
+        $(`.modal[data-target=${ this.id}]`).classList.add("show")  
       })
 
 
 
-      $$(".modal").forEach(modal=>{  //4️⃣想要关闭“模态框”时，选择页面上所有的 model，形成一个 Nodelist。遍历这个 Nodelist；
-        
-        
-        modal.querySelector(".close").onclick = function() {  //4️⃣-1：选择每一个 model 里的“close”，并绑定点击事件；
-          modal.classList.remove("show")  //4️⃣-2：当点击时，去掉里边的 show；
+      $$(".modal").forEach(modal=>{  
+        modal.querySelector(".close").onclick = function() {  
+          modal.classList.remove("show")  
         }
         
-        //4️⃣-4：同理，选择每一个 model 里的“btn”，并绑定点击事件。当点击时，去掉里边的 show；
+        
         modal.querySelector(".footer .btn").onclick = function() {
           modal.classList.remove("show")
         }
